@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>◈ YAWM AI</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0f1428;
+    color: #e2e8f0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1a1f3e, #2d1b69);
+    border-bottom: 1px solid #8250dc33;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 1.4rem; color: #a855f7; font-weight: 700; }
+  header span { color: #64748b; font-size: 0.85rem; }
+  #connection-status { margin-left: auto; font-size: 0.8rem; }
+
+  .main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    overflow: hidden;
+  }
+
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid #1e293b;
+  }
+
+  .messages {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .msg {
+    max-width: 82%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+  .msg.user   { align-self: flex-end; background: #2d1b69; border: 1px solid #8250dc55; }
+  .msg.ai     { align-self: flex-start; background: #1e293b; border: 1px solid #334155; }
+  .msg.system {
+    align-self: center;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.78rem;
+    border: 1px dashed #334155;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  /* Query response card */
+  .query-card {
+    align-self: flex-start;
+    width: 98%;
+    background: #1e293b;
+    border: 1px solid #8250dc44;
+    border-left: 3px solid #a855f7;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .query-card .intent-badge {
+    display: inline-block;
+    background: #2d1b69;
+    color: #a855f7;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 0.73rem;
+    margin-bottom: 10px;
+  }
+  .query-card .response-text {
+    color: #e2e8f0;
+    font-size: 0.86rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  /* Params card */
+  .params-card {
+    align-self: flex-start;
+    width: 98%;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .params-card h3 { color: #a855f7; margin-bottom: 10px; font-size: 0.88rem; }
+  .param { display: flex; gap: 8px; margin: 5px 0; font-size: 0.83rem; }
+  .param .lbl { color: #64748b; min-width: 115px; }
+  .param .val { color: #e2e8f0; }
+  .card-actions { display: flex; gap: 8px; margin-top: 14px; }
+  .btn-run {
+    background: #8250dc; color: #fff; border: none;
+    padding: 8px 22px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;
+  }
+  .btn-run:hover { background: #9333ea; }
+  .btn-cancel {
+    background: transparent; color: #64748b;
+    border: 1px solid #334155; padding: 8px 22px;
+    border-radius: 8px; cursor: pointer; font-size: 0.85rem;
+  }
+  .btn-cancel:hover { color: #e2e8f0; }
+
+  /* Summary card */
+  .summary-card {
+    align-self: flex-start;
+    width: 98%;
+    background: #1e293b;
+    border: 1px solid #22c55e33;
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .summary-card h3 { color: #22c55e; margin-bottom: 10px; font-size: 0.9rem; }
+  .srow {
+    display: flex; gap: 8px; margin: 6px 0;
+    font-size: 0.83rem; flex-wrap: wrap; align-items: flex-start;
+  }
+  .srow .lbl { color: #64748b; min-width: 130px; flex-shrink: 0; }
+  .tag {
+    display: inline-block; background: #334155;
+    border-radius: 6px; padding: 2px 8px;
+    font-size: 0.73rem; margin: 2px;
+  }
+
+  /* Input area */
+  .input-area {
+    padding: 14px 16px;
+    border-top: 1px solid #1e293b;
+    display: flex; gap: 10px;
+    flex-shrink: 0;
+  }
+  .input-area input {
+    flex: 1; background: #1e293b; border: 1px solid #334155;
+    border-radius: 10px; padding: 11px 15px;
+    color: #e2e8f0; font-size: 0.88rem; outline: none;
+  }
+  .input-area input:focus { border-color: #8250dc; }
+  .input-area input::placeholder { color: #475569; }
+
+  .btn-send {
+    background: #8250dc; color: #fff; border: none;
+    border-radius: 10px; padding: 11px 20px;
+    cursor: pointer; font-size: 0.88rem;
+  }
+  .btn-send:hover { background: #9333ea; }
+  .btn-send:disabled { background: #334155; cursor: not-allowed; }
+
+  /* Agent sidebar */
+  .agent-panel {
+    background: #0d1117;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .panel-title {
+    padding: 12px 16px;
+    font-size: 0.78rem; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 1px solid #1e293b;
+    flex-shrink: 0;
+  }
+  .agent-list {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 6px;
+  }
+  .agent-row {
+    display: flex; align-items: center; gap: 9px;
+    padding: 9px 11px; border-radius: 8px; margin: 2px 0;
+    transition: all 0.2s;
+  }
+  .agent-row.idle    { opacity: 0.35; }
+  .agent-row.running { background: #1e293b; animation: pulse 1.2s infinite; }
+  .agent-row.done    { opacity: 1; }
+  @keyframes pulse {
+    0%,100% { background: #1e293b; }
+    50%      { background: #2d1b3d; }
+  }
+  .a-num  { color: #475569; font-size: 0.72rem; min-width: 22px; }
+  .a-icon { font-size: 1rem; }
+  .a-name { flex: 1; font-size: 0.82rem; }
+  .a-badge { font-size: 0.72rem; padding: 2px 8px; border-radius: 10px; }
+  .b-idle    { background: #1e293b; color: #475569; }
+  .b-running { background: #2d1b3d; color: #a855f7; }
+  .b-done    { background: #14532d; color: #22c55e; }
+
+  /* Log */
+  .log-panel {
+    border-top: 1px solid #1e293b;
+    height: 175px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .log-entries {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 6px 12px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.72rem;
+    color: #475569;
+  }
+  .log-entries .entry { padding: 2px 0; }
+  .entry.done   { color: #22c55e; }
+  .entry.error  { color: #ef4444; }
+  .entry.status { color: #8250dc; }
+
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>◈ YAWM AI</h1>
+  <span>10-Agent Daily Planner · Ramadan Edition · LangGraph + MCP</span>
+  <span id="connection-status" style="color:#ef4444">● disconnected</span>
+</header>
+
+<div class="main">
+
+  <div class="chat-panel">
+    <div class="messages" id="messages">
+      <div class="msg system">🌙 Tell me how you're feeling and I'll plan your day</div>
+      <div class="msg ai">
+        <b>Plan your day:</b><br>
+        → "I'm feeling tired today"<br>
+        → "Feeling focused, I have a meeting at 3pm"<br>
+        → "Energized, need to finish my presentation"<br><br>
+        <b>Or ask a direct question:</b><br>
+        → "What Juz am I at?"<br>
+        → "What adhkar should I do this morning?"<br>
+        → "When should I sleep tonight?"<br><br>
+        <span style="color:#64748b;font-size:0.8rem">
+          💡 Questions are auto-detected · Dhikr, Quran &amp; prayers are automatic
+        </span>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input
+        id="user-input"
+        type="text"
+        placeholder="How are you feeling today? Or ask a question..."
+        autocomplete="off"
+      />
+      <button class="btn-send" id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <div class="agent-panel">
+    <div class="panel-title">⚡ Agents</div>
+    <div class="agent-list" id="agent-list"></div>
+    <div class="log-panel">
+      <div class="panel-title">📋 Live Logs</div>
+      <div class="log-entries" id="log-entries"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const AGENTS = [
+  { key: "task_collector",     num: "1",   icon: "🔍", label: "TaskCollector"  },
+  { key: "planner",            num: "2",   icon: "🧠", label: "Planner"        },
+  { key: "supervisor",         num: "3",   icon: "🎯", label: "Supervisor"     },
+  { key: "salah_guardian",     num: "4",   icon: "🕌", label: "SalahGuardian"  },
+  { key: "dhikr_agent",        num: "5",   icon: "📿", label: "DhikrAgent"     },
+  { key: "quran_wird",         num: "6",   icon: "📖", label: "QuranWird"      },
+  { key: "day_planner",        num: "7",   icon: "⚡", label: "DayPlanner"     },
+  { key: "canva_agent",        num: "8",   icon: "🎨", label: "CanvaAgent"     },
+  { key: "deen_podcast_agent", num: "8.5", icon: "🎧", label: "DeenPodcast"    },
+  { key: "calendar_agent",     num: "9",   icon: "📅", label: "CalendarAgent"  },
+];
+
+let ws         = null;
+let pendingParams = null;
+let currentDay = 9;   // updated when extract returns params
+let currentMood = "focused";
+
+function scrollToBottom() {
+  const el = document.getElementById("messages");
+  setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+}
+
+function renderAgents(statuses = {}) {
+  document.getElementById("agent-list").innerHTML = AGENTS.map(a => {
+    const s = statuses[a.key] || "idle";
+    const badgeText = s === "running" ? "◈ running"
+                    : s === "done"    ? "✓ done"
+                    : "· idle";
+    return `<div class="agent-row ${s}" id="ar-${a.key}">
+      <span class="a-num">${a.num}</span>
+      <span class="a-icon">${a.icon}</span>
+      <span class="a-name">${a.label}</span>
+      <span class="a-badge b-${s}">${badgeText}</span>
+    </div>`;
+  }).join("");
+}
+
+function addLog(msg, type = "status") {
+  const el = document.getElementById("log-entries");
+  const d  = document.createElement("div");
+  d.className = `entry ${type}`;
+  d.textContent = `${new Date().toLocaleTimeString()} · ${msg}`;
+  el.appendChild(d);
+  el.scrollTop = el.scrollHeight;
+}
+
+function addMsg(html, cls = "ai") {
+  const el = document.getElementById("messages");
+  const d  = document.createElement("div");
+  d.className = `msg ${cls}`;
+  d.innerHTML = html;
+  el.appendChild(d);
+  scrollToBottom();
+  return d;
+}
+
+function addSysMsg(text) {
+  const el = document.getElementById("messages");
+  const d  = document.createElement("div");
+  d.className = "msg system";
+  d.textContent = text;
+  el.appendChild(d);
+  scrollToBottom();
+}
+
+function connect() {
+  ws = new WebSocket(`ws://${location.host}/ws`);
+
+  ws.onopen = () => {
+    document.getElementById("connection-status").textContent = "● connected";
+    document.getElementById("connection-status").style.color = "#22c55e";
+    renderAgents();
+    addLog("Connected to YAWM AI", "status");
+    setInputEnabled(true);
+  };
+
+  ws.onclose = () => {
+    document.getElementById("connection-status").textContent = "● disconnected";
+    document.getElementById("connection-status").style.color = "#ef4444";
+    setTimeout(connect, 3000);
+  };
+
+  ws.onmessage = e => handle(JSON.parse(e.data));
+}
+
+function handle(msg) {
+  switch (msg.type) {
+
+    case "params":
+      pendingParams = msg.params;
+      // Store for use in direct queries
+      currentDay  = msg.params.ramadan_day || currentDay;
+      currentMood = msg.params.mood        || currentMood;
+      showParamsCard(msg.params);
+      setInputEnabled(true);
+      break;
+
+    case "agents":
+      renderAgents(msg.statuses);
+      break;
+
+    case "agent_done":
+      renderAgents(msg.statuses);
+      addLog(`${msg.icon} ${msg.label} done`, "done");
+      break;
+
+    case "log":
+      addLog(msg.message, "status");
+      break;
+
+    case "status":
+      addLog(msg.message, "status");
+      break;
+
+    case "error":
+      addLog(`ERROR: ${msg.message}`, "error");
+      addMsg(`❌ ${msg.message}`);
+      setInputEnabled(true);
+      break;
+
+    case "summary":
+      showSummary(msg);
+      setInputEnabled(true);
+      renderAgents(Object.fromEntries(AGENTS.map(a => [a.key, "done"])));
+      break;
+
+    case "done":
+      addLog(msg.message, "done");
+      break;
+
+    case "intent":
+      addLog(`Intent: ${msg.intent} (${Math.round(msg.confidence * 100)}%)`, "status");
+      break;
+
+    case "query_response":
+      showQueryResponse(msg.intent, msg.response);
+      setInputEnabled(true);
+      break;
+  }
+}
+
+// ── Query response card ───────────────────────────────────────────────────────
+function showQueryResponse(intent, response) {
+  const el   = document.getElementById("messages");
+  const card = document.createElement("div");
+  card.className = "query-card";
+  const icons = { quran:"📖", dhikr:"📿", salah:"🕌", sleep:"😴", tasks:"📋", general:"🌙" };
+  const icon  = icons[intent] || "🌙";
+  card.innerHTML = `
+    <div class="intent-badge">${icon} ${intent}</div>
+    <div class="response-text">${response}</div>
+  `;
+  el.appendChild(card);
+  scrollToBottom();
+}
+
+// ── Params card ───────────────────────────────────────────────────────────────
+function showParamsCard(p) {
+  const el   = document.getElementById("messages");
+  const card = document.createElement("div");
+  card.className = "params-card";
+  const dayLabel = p._day_auto
+    ? `${p.ramadan_day} <span style="color:#64748b;font-size:0.78rem">(auto-computed)</span>`
+    : p.ramadan_day;
+  card.innerHTML = `
+    <h3>◈ Parameters extracted</h3>
+    <div class="param"><span class="lbl">📋 Mood</span><span class="val">${p.mood || 'focused'}</span></div>
+    <div class="param"><span class="lbl">🌙 Ramadan day</span><span class="val">${dayLabel}</span></div>
+    ${p.voice_note
+      ? `<div class="param"><span class="lbl">📝 Note</span><span class="val">${p.voice_note}</span></div>`
+      : ""}
+    <div class="param"><span class="lbl">🌍 Timezone</span><span class="val">${p.timezone || 'Africa/Casablanca'}</span></div>
+    <div class="card-actions">
+      <button class="btn-run" onclick="confirmRun()">▶ Run Pipeline</button>
+      <button class="btn-cancel" onclick="cancelRun(this)">Cancel</button>
+    </div>`;
+  el.appendChild(card);
+  scrollToBottom();
+}
+
+function confirmRun() {
+  if (!pendingParams) return;
+  document.querySelectorAll(".card-actions").forEach(a => a.remove());
+  addSysMsg("🚀 Running 10-agent pipeline...");
+  setInputEnabled(false);
+  renderAgents({});
+  ws.send(JSON.stringify({
+    action:      "run",
+    mood:        pendingParams.mood        || "focused",
+    ramadan_day: pendingParams.ramadan_day || currentDay,
+    voice_note:  pendingParams.voice_note,
+    timezone:    pendingParams.timezone    || "Africa/Casablanca",
+  }));
+  pendingParams = null;
+}
+
+function cancelRun(btn) {
+  btn.closest(".params-card").remove();
+  addSysMsg("Cancelled. Try again!");
+  pendingParams = null;
+}
+
+// ── Summary card ──────────────────────────────────────────────────────────────
+function showSummary(d) {
+  const el   = document.getElementById("messages");
+  const card = document.createElement("div");
+  card.className = "summary-card";
+
+  const tags = Object.entries(d.block_types || {})
+    .map(([k, v]) => `<span class="tag">${k} ×${v}</span>`).join("");
+  const qp  = d.quran_progress || {};
+  const sw  = d.sleep_window   || {};
+  const vid = d.podcast_video  || {};
+  const pb  = d.podcast_block  || {};
+
+  card.innerHTML = `
+    <h3>✨ Pipeline Complete</h3>
+    <div class="srow"><span class="lbl">📅 Schedule</span><span>${d.blocks_total} blocks built</span></div>
+    <div class="srow"><span class="lbl"></span><span>${tags}</span></div>
+    ${sw.bedtime ? `<div class="srow"><span class="lbl">😴 Sleep</span>
+      <span>Bedtime ${sw.bedtime} · ${sw.cycles} cycles · ${sw.total_sleep_min} min</span></div>` : ""}
+    ${d.written_events ? `<div class="srow"><span class="lbl">📤 Google Cal</span>
+      <span>${d.written_events} events written</span></div>` : ""}
+    ${d.prayer_streak ? `<div class="srow"><span class="lbl">🔥 Prayer streak</span>
+      <span>${d.prayer_streak} days — keep it up!</span></div>` : ""}
+    ${qp.progress_label ? `
+    <div class="srow"><span class="lbl">📖 Quran</span><span>${qp.progress_label}</span></div>
+    <div class="srow"><span class="lbl"></span>
+      <span style="color:#64748b">${qp.total_pages_read}/604 pages (${qp.khatm_percent}%) · Juz ${qp.juz_completed}/30</span>
+    </div>` : ""}
+    ${vid.title ? `
+    <div class="srow"><span class="lbl">🎧 Podcast</span>
+      <span><a href="${vid.url}" target="_blank" style="color:#a855f7">${vid.title}</a>
+      ${pb.start ? `<span style="color:#64748b"> · ${pb.start}–${pb.end}</span>` : ""}</span>
+    </div>
+    <div class="srow"><span class="lbl"></span><span style="color:#64748b">Channel: ${vid.channel}</span></div>` : ""}
+    ${d.errors && d.errors.length ? `
+    <div class="srow" style="color:#ef4444"><span class="lbl">⚠ Errors</span>
+      <span>${d.errors.join("<br>")}</span></div>` : ""}
+  `;
+  el.appendChild(card);
+  scrollToBottom();
+}
+
+// ── Send — auto-detects questions vs planning statements ──────────────────────
+function sendMessage() {
+  const input = document.getElementById("user-input");
+  const text  = input.value.trim();
+  if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+  addMsg(text, "user");
+  input.value = "";
+  setInputEnabled(false);
+
+  // Auto-detect: questions go directly to query route, no extract/confirm needed
+  const isQuestion = text.includes("?") ||
+    /^(what|when|how|am i|which|where|give me|tell me|show me)/i.test(text);
+
+  if (isQuestion) {
+    addLog("Question detected — routing directly...", "status");
+    ws.send(JSON.stringify({
+      action:      "query",
+      message:     text,
+      ramadan_day: currentDay,
+      mood:        currentMood,
+    }));
+  } else {
+    // Original planning flow: extract params → show confirm card → run pipeline
+    ws.send(JSON.stringify({ action: "extract", message: text }));
+  }
+}
+
+function setInputEnabled(on) {
+  document.getElementById("user-input").disabled = !on;
+  document.getElementById("send-btn").disabled   = !on;
+}
+
+document.getElementById("user-input").addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
+
+renderAgents();
+connect();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# .gitignore
+.env
+*.pyc
+__pycache__/
+.venv/
+rag_db/
+data/quran_progress.json
+config/google_credentials.json
+config/token.json
+
+config/google_token.json
+
+get_canva_token.py

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>YAWM AI — Architecture Schema</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f4f5f7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  .label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 16px;
+    font-family: 'Courier New', monospace;
+  }
+  .card {
+    background: #fff;
+    border: 1.5px solid #d0d5e0;
+    border-radius: 6px;
+    padding: 32px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    max-width: 1100px;
+    width: 100%;
+  }
+  svg { display: block; width: 100%; height: auto; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .label { display: none; }
+    .card { border: none; box-shadow: none; padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="label">◈ YAWM AI — System Architecture · White Background SVG · Print-ready</div>
+
+<div class="card">
+<svg viewBox="0 0 1040 990" xmlns="http://www.w3.org/2000/svg"
+     style="font-family:'Courier New',monospace; background:#fff;">
+
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="9" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L9,3.5 z" fill="#777"/>
+    </marker>
+    <marker id="arr-blue" markerWidth="9" markerHeight="9" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L9,3.5 z" fill="#3b4fc8"/>
+    </marker>
+    <marker id="arr-red" markerWidth="9" markerHeight="9" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L9,3.5 z" fill="#c23b3b"/>
+    </marker>
+    <marker id="arr-gold" markerWidth="9" markerHeight="9" refX="8" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L9,3.5 z" fill="#b36a00"/>
+    </marker>
+  </defs>
+
+  <!-- ░░ GRID ░░ -->
+  <g stroke="#f2f2f2" stroke-width="1">
+    <line x1="0" y1="50"  x2="1040" y2="50"/>
+    <line x1="0" y1="130" x2="1040" y2="130"/>
+    <line x1="0" y1="210" x2="1040" y2="210"/>
+    <line x1="0" y1="290" x2="1040" y2="290"/>
+    <line x1="0" y1="370" x2="1040" y2="370"/>
+    <line x1="0" y1="450" x2="1040" y2="450"/>
+    <line x1="0" y1="530" x2="1040" y2="530"/>
+    <line x1="0" y1="610" x2="1040" y2="610"/>
+    <line x1="0" y1="690" x2="1040" y2="690"/>
+    <line x1="0" y1="770" x2="1040" y2="770"/>
+    <line x1="0" y1="850" x2="1040" y2="850"/>
+    <line x1="0" y1="930" x2="1040" y2="930"/>
+  </g>
+
+  <!-- ══════════════════════════════════════════════
+       TITLE
+  ══════════════════════════════════════════════ -->
+  <text x="520" y="22" text-anchor="middle" font-size="13" font-weight="700"
+        fill="#0f1623" letter-spacing="2">YAWM AI — HYBRID MULTI-AGENT SYSTEM ARCHITECTURE</text>
+  <text x="520" y="38" text-anchor="middle" font-size="9" fill="#999" letter-spacing="1">
+    LangGraph + LangChain + ChromaDB + MCP + Custom Python Tools · 9 Agents · 4 Patterns
+  </text>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 1 · USER
+  ══════════════════════════════════════════════ -->
+  <rect x="420" y="48" width="200" height="34" rx="17"
+        fill="#fff" stroke="#888" stroke-width="1.5"/>
+  <text x="520" y="70" text-anchor="middle" font-size="11" font-weight="700" fill="#444">USER MESSAGE</text>
+  <line x1="520" y1="82" x2="520" y2="100" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 2 · [0] ROUTER
+  ══════════════════════════════════════════════ -->
+  <rect x="388" y="102" width="264" height="56" rx="6"
+        fill="#eef0ff" stroke="#3b4fc8" stroke-width="2"/>
+  <text x="520" y="123" text-anchor="middle" font-size="11" font-weight="700" fill="#3b4fc8">[0] ROUTER</text>
+  <text x="520" y="138" text-anchor="middle" font-size="9" fill="#555">Intent Classifier · LLM · temperature=0</text>
+  <text x="520" y="151" text-anchor="middle" font-size="8.5" fill="#3b4fc8">Pattern: Agents as Tools (direct query bypass)</text>
+
+  <!-- Router → Direct Query (gold dashed left) -->
+  <path d="M388,130 Q254,130 184,196"
+        stroke="#b36a00" stroke-width="1.5" fill="none"
+        stroke-dasharray="5,3" marker-end="url(#arr-gold)"/>
+  <text x="272" y="146" text-anchor="middle" font-size="9" fill="#b36a00">direct query</text>
+  <text x="272" y="158" text-anchor="middle" font-size="8.5" fill="#b36a00">(bypass pipeline)</text>
+
+  <!-- Router → Pipeline (blue down) -->
+  <line x1="520" y1="158" x2="520" y2="178" stroke="#3b4fc8" stroke-width="2" marker-end="url(#arr-blue)"/>
+  <text x="548" y="172" font-size="9" fill="#3b4fc8">full_plan</text>
+
+  <!-- Direct Query side box -->
+  <rect x="22" y="198" width="232" height="96" rx="6"
+        fill="#fffdf0" stroke="#b36a00" stroke-width="1.5"/>
+  <text x="138" y="218" text-anchor="middle" font-size="10" font-weight="700" fill="#b36a00">DIRECT QUERY AGENTS</text>
+  <text x="138" y="233" text-anchor="middle" font-size="8.5" fill="#777">Quran · Dhikr · Salah · Sleep · General</text>
+  <text x="138" y="247" text-anchor="middle" font-size="8.5" fill="#777">5 specialist agents — instant answers</text>
+  <text x="138" y="261" text-anchor="middle" font-size="8.5" fill="#b36a00">Full pipeline NOT triggered</text>
+  <text x="138" y="275" text-anchor="middle" font-size="8.5" fill="#b36a00">Pattern: Agents as Tools</text>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 3 · [1] TASK COLLECTOR
+  ══════════════════════════════════════════════ -->
+  <rect x="388" y="180" width="264" height="54" rx="6"
+        fill="#f5f7ff" stroke="#5a6ed6" stroke-width="1.5"/>
+  <text x="520" y="201" text-anchor="middle" font-size="11" font-weight="700" fill="#3b4fc8">[1] TASK COLLECTOR</text>
+  <text x="520" y="216" text-anchor="middle" font-size="8.5" fill="#555">ReAct Agent (LangChain)</text>
+  <text x="520" y="228" text-anchor="middle" font-size="8.5" fill="#555">MCP Tools: Notion + Todoist · normalizes tasks</text>
+  <line x1="520" y1="234" x2="520" y2="252" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 4 · [2] PLANNER
+  ══════════════════════════════════════════════ -->
+  <rect x="388" y="254" width="264" height="54" rx="6"
+        fill="#f5f7ff" stroke="#5a6ed6" stroke-width="1.5"/>
+  <text x="520" y="275" text-anchor="middle" font-size="11" font-weight="700" fill="#3b4fc8">[2] PLANNER</text>
+  <text x="520" y="290" text-anchor="middle" font-size="8.5" fill="#555">ReAct Agent (LangChain)</text>
+  <text x="520" y="302" text-anchor="middle" font-size="8.5" fill="#555">MCP Tool: AlAdhan API → routing_config JSON</text>
+  <line x1="520" y1="308" x2="520" y2="326" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 5 · [3] SUPERVISOR
+  ══════════════════════════════════════════════ -->
+  <rect x="372" y="328" width="296" height="54" rx="6"
+        fill="#fffbea" stroke="#b36a00" stroke-width="2"/>
+  <text x="520" y="349" text-anchor="middle" font-size="11" font-weight="700" fill="#b36a00">[3] SUPERVISOR</text>
+  <text x="520" y="364" text-anchor="middle" font-size="8.5" fill="#555">Pure Python Logic · ZERO LLM · Orchestrator</text>
+  <text x="520" y="376" text-anchor="middle" font-size="8.5" fill="#b36a00">Reads routing_config · launches 3 parallel agents</text>
+
+  <!-- Fan-out from Supervisor -->
+  <line x1="438" y1="382" x2="218" y2="418" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="520" y1="382" x2="520" y2="418" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="602" y1="382" x2="822" y2="418" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="318" y="406" font-size="8" fill="#bbb">parallel fan-out</text>
+  <text x="656" y="406" font-size="8" fill="#bbb">parallel fan-out</text>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 6 · PARALLEL AGENTS 4 + 5 + 6
+  ══════════════════════════════════════════════ -->
+
+  <!-- [4] SALAH GUARDIAN -->
+  <rect x="84" y="420" width="226" height="72" rx="6"
+        fill="#f0faf5" stroke="#1a7a4a" stroke-width="1.5"/>
+  <text x="197" y="440" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1a7a4a">[4] SALAH GUARDIAN</text>
+  <text x="197" y="455" text-anchor="middle" font-size="8.5" fill="#555">ReAct Agent (LangChain)</text>
+  <text x="197" y="468" text-anchor="middle" font-size="8.5" fill="#555">MCP Tool: AlAdhan API</text>
+  <text x="197" y="481" text-anchor="middle" font-size="8.5" fill="#1a7a4a">Python: build_prayer_blocks()</text>
+  <text x="197" y="490" text-anchor="middle" font-size="7.5" fill="#1a7a4a">5 prayers · Iftar 60min · Qadr ext.</text>
+
+  <!-- [5] DHIKR AGENT -->
+  <rect x="376" y="420" width="288" height="72" rx="6"
+        fill="#f7f0ff" stroke="#6b3fb5" stroke-width="1.5"/>
+  <text x="520" y="440" text-anchor="middle" font-size="10.5" font-weight="700" fill="#6b3fb5">[5] DHIKR AGENT</text>
+  <text x="520" y="455" text-anchor="middle" font-size="8.5" fill="#555">LLM Call (LangChain)</text>
+  <text x="520" y="468" text-anchor="middle" font-size="8.5" fill="#555">Morning + Evening adhkar blocks</text>
+  <text x="520" y="481" text-anchor="middle" font-size="8.5" fill="#6b3fb5">Extra block on Laylat Al-Qadr nights</text>
+
+  <!-- [6] QURAN WIRD -->
+  <rect x="730" y="420" width="226" height="72" rx="6"
+        fill="#fff0f5" stroke="#a03060" stroke-width="1.5"/>
+  <text x="843" y="440" text-anchor="middle" font-size="10.5" font-weight="700" fill="#a03060">[6] QURAN WIRD</text>
+  <text x="843" y="455" text-anchor="middle" font-size="8.5" fill="#555">LLM Call (LangChain)</text>
+  <text x="843" y="468" text-anchor="middle" font-size="8.5" fill="#555">Python: QuranTracker JSON</text>
+  <text x="843" y="481" text-anchor="middle" font-size="8.5" fill="#a03060">Ceiling div · real data · no hallucination</text>
+
+  <!-- Fan-in to DayPlanner -->
+  <line x1="197" y1="492" x2="454" y2="530" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="520" y1="492" x2="520" y2="530" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+  <line x1="843" y1="492" x2="586" y2="530" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="520" y="520" text-anchor="middle" font-size="8" fill="#bbb">fan-in</text>
+
+  <!-- RAG injection -->
+  <text x="922" y="518" font-size="8.5" fill="#6b3fb5">+ RAG retrieval</text>
+  <path d="M970,522 L906,530" stroke="#6b3fb5" stroke-width="1"
+        stroke-dasharray="3,2" fill="none" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 7 · [7] DAY PLANNER
+  ══════════════════════════════════════════════ -->
+  <rect x="348" y="532" width="344" height="68" rx="6"
+        fill="#fff8f0" stroke="#b36a00" stroke-width="2"/>
+  <text x="520" y="554" text-anchor="middle" font-size="11" font-weight="700" fill="#b36a00">[7] DAY PLANNER</text>
+  <text x="520" y="569" text-anchor="middle" font-size="8.5" fill="#555">LLM Call (LangChain) · receives all fixed blocks</text>
+  <text x="520" y="582" text-anchor="middle" font-size="8.5" fill="#555">Python: SleepCalculator · RAG: ChromaDB + SentenceTransformers</text>
+  <text x="520" y="593" text-anchor="middle" font-size="8.5" fill="#b36a00">Full conflict-free schedule 03:00 → 23:59</text>
+  <line x1="520" y1="600" x2="520" y2="620" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 8 · [7.5] CONFLICT CHECKER
+  ══════════════════════════════════════════════ -->
+  <rect x="332" y="622" width="376" height="72" rx="6"
+        fill="#fff5f5" stroke="#c23b3b" stroke-width="2.5"/>
+  <text x="520" y="644" text-anchor="middle" font-size="11" font-weight="700" fill="#c23b3b">[7.5] CONFLICT CHECKER</text>
+  <text x="520" y="659" text-anchor="middle" font-size="8.5" fill="#555">ZERO LLM · Pure Python · Graph Agent Pattern (LangGraph)</text>
+  <text x="520" y="672" text-anchor="middle" font-size="8.5" fill="#555">Checks: all 5 prayers present · no task/prayer overlap</text>
+  <text x="520" y="685" text-anchor="middle" font-size="8.5" fill="#c23b3b">Salah violation → RETRY (max 2×) · Other issues → warning only</text>
+
+  <!-- Violations → retry loop (red dashed, left side) -->
+  <path d="M332,656 Q182,656 182,355 Q182,328 372,328"
+        stroke="#c23b3b" stroke-width="2" fill="none"
+        stroke-dasharray="7,3" marker-end="url(#arr-red)"/>
+  <text x="112" y="498" text-anchor="middle" font-size="9" fill="#c23b3b">VIOLATIONS</text>
+  <text x="112" y="512" text-anchor="middle" font-size="9" fill="#c23b3b">retry ≤ 2×</text>
+
+  <!-- Clean → proceed (blue down) -->
+  <line x1="520" y1="694" x2="520" y2="714" stroke="#3b4fc8" stroke-width="2" marker-end="url(#arr-blue)"/>
+  <text x="558" y="708" font-size="9" fill="#3b4fc8">clean ✓ → proceed</text>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 9 · [8] CANVA AGENT
+  ══════════════════════════════════════════════ -->
+  <rect x="348" y="716" width="344" height="60" rx="6"
+        fill="#f7f0ff" stroke="#6b3fb5" stroke-width="1.5"/>
+  <text x="520" y="737" text-anchor="middle" font-size="11" font-weight="700" fill="#6b3fb5">[8] CANVA AGENT</text>
+  <text x="520" y="752" text-anchor="middle" font-size="8.5" fill="#555">ZERO LLM · Python: Pillow library (no external API)</text>
+  <text x="520" y="765" text-anchor="middle" font-size="8.5" fill="#6b3fb5">Renders 1080×1920 PNG · dark theme · color-coded blocks · legend</text>
+  <line x1="520" y1="776" x2="520" y2="796" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 10 · [8.5] DEEN PODCAST AGENT
+  ══════════════════════════════════════════════ -->
+  <rect x="348" y="798" width="344" height="62" rx="6"
+        fill="#fffbea" stroke="#b36a00" stroke-width="1.5"/>
+  <text x="520" y="819" text-anchor="middle" font-size="11" font-weight="700" fill="#b36a00">[8.5] DEEN PODCAST AGENT</text>
+  <text x="520" y="834" text-anchor="middle" font-size="8.5" fill="#555">ReAct Agent (LangChain)</text>
+  <text x="520" y="847" text-anchor="middle" font-size="8.5" fill="#555">MCP Tools: YouTube search · Gmail · WhatsApp (CallMeBot)</text>
+  <text x="520" y="858" text-anchor="middle" font-size="8.5" fill="#b36a00">Finds free slot · topic rotates by Ramadan phase</text>
+  <line x1="520" y1="860" x2="520" y2="880" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ══════════════════════════════════════════════
+       ROW 11 · [9] CALENDAR AGENT
+  ══════════════════════════════════════════════ -->
+  <rect x="348" y="882" width="344" height="62" rx="6"
+        fill="#f0faf5" stroke="#1a7a4a" stroke-width="1.5"/>
+  <text x="520" y="903" text-anchor="middle" font-size="11" font-weight="700" fill="#1a7a4a">[9] CALENDAR AGENT</text>
+  <text x="520" y="918" text-anchor="middle" font-size="8.5" fill="#555">ReAct Agent (LangChain)</text>
+  <text x="520" y="931" text-anchor="middle" font-size="8.5" fill="#555">MCP Tool: Google Calendar · cleanup old YAWM AI events first</text>
+  <text x="520" y="942" text-anchor="middle" font-size="8.5" fill="#1a7a4a">Batch-writes all blocks color-coded · fully idempotent</text>
+
+  <!-- END -->
+  <line x1="520" y1="944" x2="520" y2="962" stroke="#777" stroke-width="1.5" marker-end="url(#arr)"/>
+  <ellipse cx="520" cy="973" rx="28" ry="14"
+           fill="#fff" stroke="#888" stroke-width="1.5"/>
+  <text x="520" y="977" text-anchor="middle" font-size="10" fill="#555">END</text>
+
+  <!-- ══════════════════════════════════════════════
+       PATTERN BADGES — right column
+  ══════════════════════════════════════════════ -->
+  <rect x="766" y="542" width="268" height="146" rx="6"
+        fill="#fafafa" stroke="#ddd" stroke-width="1"/>
+  <text x="778" y="562" font-size="9.5" font-weight="700" fill="#333">4 HYBRID PATTERNS USED</text>
+
+  <rect x="778" y="572" width="10" height="10" rx="2" fill="#3b4fc8"/>
+  <text x="794" y="581" font-size="8.5" fill="#333">Hierarchical Pipeline — spine 1→2→3→7→8→9</text>
+
+  <rect x="778" y="592" width="10" height="10" rx="2" fill="#1a7a4a"/>
+  <text x="794" y="601" font-size="8.5" fill="#333">Fan-out / Fan-in — agents 4, 5, 6 in parallel</text>
+
+  <rect x="778" y="612" width="10" height="10" rx="2" fill="#c23b3b"/>
+  <text x="794" y="621" font-size="8.5" fill="#333">Graph Agent Pattern — ConflictChecker loop</text>
+
+  <rect x="778" y="632" width="10" height="10" rx="2" fill="#b36a00"/>
+  <text x="794" y="641" font-size="8.5" fill="#333">Agents as Tools — Router direct query bypass</text>
+
+  <line x1="778" y1="655" x2="1026" y2="655" stroke="#eee" stroke-width="1"/>
+  <text x="778" y="668" font-size="8" fill="#aaa">ZERO LLM nodes:</text>
+  <text x="778" y="680" font-size="8" fill="#c23b3b">Supervisor · ConflictChecker · CanvaAgent</text>
+
+  <!-- ══════════════════════════════════════════════
+       LEGEND — right column bottom
+  ══════════════════════════════════════════════ -->
+  <rect x="766" y="820" width="268" height="128" rx="6"
+        fill="#fafafa" stroke="#ddd" stroke-width="1"/>
+  <text x="778" y="840" font-size="9.5" font-weight="700" fill="#333">LEGEND</text>
+
+  <line x1="778" y1="854" x2="818" y2="854" stroke="#3b4fc8" stroke-width="2"/>
+  <text x="826" y="858" font-size="8.5" fill="#555">Conditional edge (Graph Pattern)</text>
+
+  <line x1="778" y1="872" x2="818" y2="872" stroke="#777" stroke-width="1.5"/>
+  <text x="826" y="876" font-size="8.5" fill="#555">Sequential / fan-out / fan-in flow</text>
+
+  <line x1="778" y1="890" x2="818" y2="890" stroke="#b36a00" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="826" y="894" font-size="8.5" fill="#555">Direct query bypass</text>
+
+  <line x1="778" y1="908" x2="818" y2="908" stroke="#c23b3b" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="826" y="912" font-size="8.5" fill="#555">Retry loop on Salah violations</text>
+
+  <text x="778" y="938" font-size="7.5" fill="#aaa">◈ YAWM AI · LangGraph + LangChain + ChromaDB + MCP</text>
+
+</svg>
+</div>
+
+</body>
+</html>

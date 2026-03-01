@@ -1,0 +1,12 @@
+{
+  "name": "yawm-ai",
+  "version": "1.0.0",
+  "description": "``` You speak / your calendar syncs          ↓ ┌─────────────────────┐ │   TaskCollector     │  Agent 1 — Google Cal + Notion + Todoist + Voice └──────────┬──────────┘            ↓ ┌─────────────────────┐ │     Planner         │  Agent 2 — Ramadan day + mood → routing JSON └──────────┬──────────┘            ↓ ┌─────────────────────┐ │    Supervisor       │  Agent 3 — routes to right agents └──┬───┬───┬──────────┘    ↓   ↓   ↓          ← PARALLEL fan-out [Salah][Dhikr][Quran]    Agents 4–6    ↓   ↓   ↓          ← fan-in ┌─────────────────────┐ │    DayPlanner       │  Agent 7 — genius conflict-free scheduler └──────────┬──────────┘            ↓ ┌─────────────────────┐ │    CanvaAgent       │  Agent 8 — renders PNG schedule card └──────────┬──────────┘            ↓ ┌─────────────────────┐ │  CalendarAgent      │  Agent 9 — writes all blocks to Google Calendar └─────────────────────┘ ```",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
