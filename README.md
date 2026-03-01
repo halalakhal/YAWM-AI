@@ -1,5 +1,10 @@
-# ◈ YAWM AI — 9-Agent Hybrid Daily Planner
+Here's the updated README with all three additions:
+
+```markdown
+# ◈ YAWM AI — 10-Agent Hybrid Daily Planner
 ### LangChain · LangGraph · ChromaDB · MCP Servers · Custom Python Tools · Ramadan Edition
+
+> Ramadan-focused MAS — 10 agents that plan your day around prayer times, sync to Google Calendar, and email you a curated Islamic podcast + downloadable schedule card.
 
 ```
 You speak / your calendar syncs
@@ -65,6 +70,52 @@ The evolved architecture adopts a **Hybrid Pattern**:
 
 The Router adds the efficiency layer the pure graph lacked, while the graph topology preserves typed state, parallel execution, and conditional edge guarantees.
 
+> 📄 Full architecture diagram and technical report available in [`Architecture_Report/`](./Architecture_Report/)
+
+---
+
+## 🌐 Web Interface — FastAPI + WebSocket
+
+YAWM AI includes a real-time web interface built with **FastAPI** and **WebSockets** — no terminal needed.
+
+```bash
+uvicorn app:app --reload
+```
+
+Open **http://localhost:8000** and:
+- Type how you're feeling → parameters are extracted automatically
+- Confirm → the full 10-agent pipeline runs in real time
+- Watch every agent complete live in the right panel
+- See the full summary: schedule blocks, sleep window, Quran progress, podcast link
+
+The interface uses the **exact same** `graph.astream()` pipeline as `main.py` — no simulation, no shortcuts.
+
+```
+app.py          ← FastAPI backend · WebSocket streaming · LLM parameter extraction
+ui/index.html   ← Single-page dark UI · real-time agent status · live logs
+```
+
+---
+
+## 📊 Observability — LangFuse Tracing
+
+YAWM AI integrates **LangFuse** for full LLM observability across all agents.
+
+Every pipeline run is traced end-to-end:
+- Token usage and cost per agent
+- Latency breakdown (which agent is slowest)
+- Full input/output for every LLM call
+- Session-level trace grouping per user run
+
+```bash
+# Add to .env
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_HOST=https://cloud.langfuse.com
+```
+
+LangFuse is optional — if keys are not set, the pipeline runs normally without tracing.
+
 ---
 
 ## 🚀 Quick Start
@@ -96,17 +147,22 @@ cp .env.example .env
 1. Go to [todoist.com/app/settings/integrations/developer](https://todoist.com/app/settings/integrations/developer)
 2. Copy your API token to `TODOIST_API_TOKEN`
 
-### 6. Run
+### 6. Seed RAG preferences
 ```bash
-# Default (today, Ramadan Day 21, focused mood)
+python -m rag.preferences
+```
+
+### 7. Run
+```bash
+# Web interface (recommended)
+uvicorn app:app --reload
+
+# CLI
 python main.py
 
 # Custom
 python main.py --mood tired --ramadan-day 27
 python main.py --voice "Don't forget Iftar talk tonight" --ramadan-day 29
-
-# Help
-python main.py --help
 ```
 
 ---
@@ -116,6 +172,14 @@ python main.py --help
 ```
 yawm_ai/
 ├── main.py                         ← CLI entry point
+├── app.py                          ← FastAPI backend · WebSocket streaming
+├── settings.py                     ← Root-level settings alias
+├── start-mcp.cmd                   ← MCP server launcher
+│
+├── ui/
+│   └── index.html                  ← Web interface · dark theme · real-time agents
+│
+├── Architecture_Report/            ← Full architecture diagram + technical PDF report
 │
 ├── graph/
 │   ├── state.py                    ← LangGraph shared TypedDict state (YawmState)
@@ -159,11 +223,11 @@ yawm_ai/
 │   ├── prayer_times.py             ← Prayer time helpers + Ramadan logic
 │   └── schedule_renderer.py        ← Pillow PNG card generator
 │
-├── data/
-│   └── quran_progress.json         ← Persistent Quran reading tracker
-│
 ├── config/
 │   └── settings.py                 ← Centralised env config
+│
+├── data/
+│   └── quran_progress.json         ← Persistent Quran reading tracker
 │
 ├── output/                         ← Generated PNG cards saved here
 ├── requirements.txt
@@ -233,8 +297,6 @@ Agents import **only the tools they need** via `client.get_tools(server_name="..
 
 ## 🧩 Custom Python Tools (Non-LLM)
 
-These are deterministic utilities — not LLM calls. They produce reliable data that LLM agents consume.
-
 | Tool | What it does |
 |------|-------------|
 | `SleepCalculator` | Works backward from 3:15 AM, fits complete 90-min cycles based on mood |
@@ -256,7 +318,7 @@ Personal preferences are stored as vector embeddings using `all-MiniLM-L6-v2`.
 "avoid deep work after Dhuhr when tired"
 ```
 
-At DayPlanner time, a semantic similarity query retrieves the top-8 most relevant preferences for the current scheduling context and injects them into the scheduling prompt.
+At DayPlanner time, a semantic similarity query retrieves the top-8 most relevant preferences and injects them into the scheduling prompt.
 
 ---
 
@@ -282,7 +344,7 @@ At DayPlanner time, a semantic similarity query retrieves the top-8 most relevan
 - **Suhoor**: Pre-Fajr meal slot (03:30–04:15) added automatically
 - **Sleep cycles**: SleepCalculator fits complete 90-min cycles backward from Suhoor — `tired` mood gets 4 cycles, `energized` gets 3
 - **Khatm tracking**: Quran pages calculated from persistent JSON, not estimated by LLM
-- **ConflictChecker**: Only Salah violations trigger retries — other warnings do not block, because an imperfect schedule is always better than an infinite loop
+- **ConflictChecker**: Only Salah violations trigger retries — other warnings do not block
 
 ---
 
@@ -304,3 +366,9 @@ At DayPlanner time, a semantic similarity query retrieves the top-8 most relevan
 | `CALLMEBOT_PHONE` | ⬜ | WhatsApp number for DeenPodcast alerts |
 | `CALLMEBOT_API_KEY` | ⬜ | CallMeBot API key |
 | `CHROMA_PERSIST_DIR` | ⬜ | ChromaDB persistence path (default: ./data/chroma) |
+| `LANGFUSE_PUBLIC_KEY` | ⬜ | LangFuse public key for tracing |
+| `LANGFUSE_SECRET_KEY` | ⬜ | LangFuse secret key for tracing |
+| `LANGFUSE_HOST` | ⬜ | LangFuse host (default: https://cloud.langfuse.com) |
+
+---
+
