@@ -1,6 +1,4 @@
-Here's the updated README with all three additions:
 
-```markdown
 # ◈ YAWM AI — 10-Agent Hybrid Daily Planner
 ### LangChain · LangGraph · ChromaDB · MCP Servers · Custom Python Tools · Ramadan Edition
 
